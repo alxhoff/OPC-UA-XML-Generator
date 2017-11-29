@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/build",
+  "command": "/usr/bin/cc -DDATALOG_OPCUA_EXPORTS -I/home/alxhoff/git/GitHub/OPC-UA-XML-Generator -I/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/libs/libxml2/include/libxml2  -g -fPIC   -o CMakeFiles/DATALOG_OPCUA.dir/datalog_opcua_generator.c.o   -c /home/alxhoff/git/GitHub/OPC-UA-XML-Generator/datalog_opcua_generator.c",
+  "file": "/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/datalog_opcua_generator.c"
+},
+{
+  "directory": "/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/build",
+  "command": "/usr/bin/cc  -I/home/alxhoff/git/GitHub/OPC-UA-XML-Generator -I/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/libs/libxml2/include/libxml2  -g   -o CMakeFiles/EXAMPLE.dir/main.c.o   -c /home/alxhoff/git/GitHub/OPC-UA-XML-Generator/main.c",
+  "file": "/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/main.c"
+}
+]
