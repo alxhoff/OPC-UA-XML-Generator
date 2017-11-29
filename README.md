@@ -48,12 +48,11 @@ from the doc folder. Then navigate to ./html/index.html
 I wrote this quickly and dirtily, so excuse the mess.  
 
 ### To-Do  
-+ ReferenceType objects
-+ VariableType objects
-+ Check these two above exsists
++ ~~ReferenceType objects~~
++ ~~VariableType objects~~
++ ~~Check these two above exsists~~
 + Removing reference from objects
-+ Reference search
-+ Find out what ns, i and s stand for :|
++ ~~Reference search~~
 + Destoryer functions
 
 ## Objects
