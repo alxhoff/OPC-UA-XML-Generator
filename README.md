@@ -1,5 +1,5 @@
 # OPC UA Server XML Generator
-This is a dump (meaning you have to implement the generation logic) XML generator to generate XML configuration files for OPC UA server.
+This is a dumb (meaning you have to implement the generation logic) XML generator to generate XML configuration files for OPC UA server.
 
 ## What does this generator achieve?
 I found myself needing to export data to OPC UA server but not necessarily use the server more than feeding it a XML config of how the server should look and then running the server's parser..1...2...3...done. I needed a way to turn objects I could handle in C into XML nodes in such a file. This generator is for that purpose.
@@ -9,10 +9,7 @@ I found myself needing to export data to OPC UA server but not necessarily use t
 + CMake
 + build essentials
 
-## Building
-I will get around to making a demo CMake for a demo project. When such a dummy CMake exsists building can be done as follows.
-
-### How to build
+## How to build
 It's pretty tough....  
 cd into the root director and create a build dir, or don't, it'll be your mess.  
 
@@ -79,7 +76,7 @@ References contain a reference type, currently stored as a string literal but th
 
 #### Node attributes
 
-Node attributes are attributes that are connected with each of the main objects: `<UAObjectType`>, `<UAVariable`>, `<UAMethod`> and `<UAObject`>. The attributes describe the obkect's parent node ID, node ID, browse and display name as well as functions pointer that point to functions to set and modify the attribute object's values.
+Node attributes are attributes that are connected with each of the main objects: `<UAObjectType`>, `<UAVariable`>, `<UAMethod`>, `<UAVariableType`>, `<UAReferenceType`>, `<UADataType`>, `<UAView`> and `<UAObject`>. The attributes describe the obkect's parent node ID, node ID, browse and display name as well as functions pointer that point to functions to set and modify the attribute object's values.
 
 #### Object specific attributes
 
