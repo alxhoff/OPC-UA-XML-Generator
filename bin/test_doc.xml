@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE UANodeSet SYSTEM "dtdIsHere">
+<UANodeSet>
+  <NamespaceUris>
+    <Uri>urn:UnifiedAutomation:CppDemoServer:BuildingAutomation</Uri>
+  </NamespaceUris>
+  <Aliases>
+    <Alias Alias="Boolean">i=1</Alias>
+    <Alias Alias="SByte">i=2</Alias>
+    <Alias Alias="Byte">i=3</Alias>
+    <Alias Alias="Int16">i=4</Alias>
+    <Alias Alias="UInt16">i=5</Alias>
+    <Alias Alias="Int32">i=6</Alias>
+    <Alias Alias="UInt32">i=7</Alias>
+    <Alias Alias="Int64">i=8</Alias>
+    <Alias Alias="UInt64">i=9</Alias>
+    <Alias Alias="Float">i=10</Alias>
+    <Alias Alias="Double">i=11</Alias>
+    <Alias Alias="String">i=12</Alias>
+    <Alias Alias="DateTime">i=13</Alias>
+    <Alias Alias="Guid">i=14</Alias>
+    <Alias Alias="ByteString">i=15</Alias>
+    <Alias Alias="XmlElement">i=16</Alias>
+    <Alias Alias="NodeId">i=17</Alias>
+    <Alias Alias="StatusCode">i=19</Alias>
+    <Alias Alias="QualifiedName">i=20</Alias>
+    <Alias Alias="LocalizedText">i=21</Alias>
+    <Alias Alias="Number">i=26</Alias>
+    <Alias Alias="Integer">i=27</Alias>
+    <Alias Alias="UInteger">i=28</Alias>
+    <Alias Alias="Organizes">i=35</Alias>
+    <Alias Alias="HasModellingRule">i=37</Alias>
+    <Alias Alias="HasTypeDefinition">i=40</Alias>
+    <Alias Alias="HasSubtype">i=45</Alias>
+    <Alias Alias="HasProperty">i=46</Alias>
+    <Alias Alias="HasComponent">i=47</Alias>
+    <Alias Alias="NodeClass">i=257</Alias>
+    <Alias Alias="Duration">i=290</Alias>
+    <Alias Alias="UtcTime">i=294</Alias>
+    <Alias Alias="Argument">i=296</Alias>
+    <Alias Alias="Range">i=884</Alias>
+    <Alias Alias="EUInformation">i=887</Alias>
+    <Alias Alias="EnumValueType">i=7594</Alias>
+    <Alias Alias="TimeZoneDataType">i=8912</Alias>
+  </Aliases>
+  <Extensions>
+    <Extension>
+      <ModelInfo Tool="UaModeler" Hash="T9MjgfInUChe45aJYm9rKw==" Version="1.4.0"/>
+    </Extension>
+  </Extensions>
+  <UAObjectType NodeId="ns=1;i=1001" BrowseName="1:ControllerTypeXml">
+    <DisplayName>ControllerTypeXml</DisplayName>
+    <References>
+      <Reference ReferenceType="HasSubtype" IsForward="false">i=58</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=6001</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=7001</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=6002</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=5001</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=7006</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=6037</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=6035</Reference>
+    </References>
+  </UAObjectType>
+  <UAVariable ParentNodeId="ns=1;i=1001" NodeId="ns=1;i=6001" BrowseName="1:PowerConsumption" UserAccessLevel="3" AccessLevel="3" DataType="ns=51;i=52;s=test node id" ArrayDimensions="11" ValueRank="1111" IsAbstract="true">
+    <DisplayName>PowerConsumption</DisplayName>
+    <References>
+      <Reference ReferenceType="HasSubtype" IsForward="false">i=58</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=6001</Reference>
+    </References>
+  </UAVariable>
+  <UAMethod ParentNodeId="ns=1;i=1001;s=testParentS" NodeId="ns=7001;i=1" BrowseName="1:Start" MethodDeclarationId="i=666">
+    <DisplayName>Start</DisplayName>
+    <References>
+      <Reference ReferenceType="HasModellingRule">i=78</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+    </References>
+  </UAMethod>
+  <UAObject ParentNodeId="ns=1;i=1001" NodeId="ns=1;i=5001;s=TESTS" BrowseName="1:StateCondition" EventNotifier="0x0A">
+    <DisplayName>StateCondition</DisplayName>
+    <References>
+      <Reference ReferenceType="HasComponent">ns=1;i=6010</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=6014</Reference>
+    </References>
+  </UAObject>
+  <UAVariableType ParentNodeId="ns=1;i=1001;s=testParentS" NodeId="ns=7001;i=1" BrowseName="1:Start" UserAccessLevel="12" AccessLevel="10" DataType="ns=51;i=52;s=test node id" ArrayDimensions="11" ValueRank="1111" IsAbstract="true">
+    <DisplayName>Start</DisplayName>
+    <References>
+      <Reference ReferenceType="HasProperty">ns=1;i=6014</Reference>
+    </References>
+  </UAVariableType>
+  <UAReferenceType ParentNodeId="ns=1;i=1001;s=testParentS" NodeId="ns=7001;i=1" BrowseName="1:Start" UserAccessLevel="12" AccessLevel="10" IsAbstract="true" Symmetric="false" InverseName="inverse name test">
+    <DisplayName>Start</DisplayName>
+    <References>
+      <Reference ReferenceType="HasProperty">ns=1;i=6014</Reference>
+    </References>
+  </UAReferenceType>
+  <UADataType ParentNodeId="ns=1;i=1001;s=testParentS" NodeId="ns=7001;i=1" BrowseName="1:Start" UserAccessLevel="12" AccessLevel="10" IsAbstract="true">
+    <DisplayName>Start</DisplayName>
+    <References>
+      <Reference ReferenceType="HasProperty">ns=1;i=6014</Reference>
+    </References>
+  </UADataType>
+  <UAView ParentNodeId="ns=1;i=1001;s=testParentS" NodeId="ns=7001;i=1" BrowseName="1:Start" UserAccessLevel="12" AccessLevel="10" IsAbstract="false" EventNotifier="0x3C">
+    <DisplayName>Start</DisplayName>
+    <References>
+      <Reference ReferenceType="HasProperty">ns=1;i=6014</Reference>
+    </References>
+  </UAView>
+</UANodeSet>

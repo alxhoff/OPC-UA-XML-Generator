@@ -53,7 +53,7 @@ I wrote this quickly and dirtily, so excuse the mess.
 + ~~Check these two above exsists~~
 + Removing reference from objects
 + ~~Reference search~~
-+ Destoryer functions
++ ~~Destoryer functions~~
 
 ## Objects
 
