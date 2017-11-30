@@ -1,4 +1,6 @@
-libs/libxml2/share/
+#documentation
+*.html
+
 # Prerequisites
 *.d
 
