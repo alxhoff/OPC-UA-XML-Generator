@@ -1,4 +1,4 @@
-#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
 
 #IncludeRegexScan: ^.*$
 
@@ -206,15 +206,15 @@ libxml/xmlexports.h
 ansidecl.h
 -
 
-/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/datalog_opcua_generator.h
+/home/alxhoff/git/OPC-UA-XML-Generator/datalog_opcua_generator.h
 libxml/parser.h
-/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/libxml/parser.h
+/home/alxhoff/git/OPC-UA-XML-Generator/libxml/parser.h
 libxml/tree.h
-/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/libxml/tree.h
+/home/alxhoff/git/OPC-UA-XML-Generator/libxml/tree.h
 stdint.h
 -
 
-/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/main.c
+/home/alxhoff/git/OPC-UA-XML-Generator/main.c
 datalog_opcua_generator.h
-/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/datalog_opcua_generator.h
+/home/alxhoff/git/OPC-UA-XML-Generator/datalog_opcua_generator.h
 
