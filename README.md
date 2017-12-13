@@ -5,7 +5,7 @@ This is a dumb (meaning you have to implement the generation logic) XML generato
 I found myself needing to export data to OPC UA server but not necessarily use the server more than feeding it a XML config of how the server should look and then running the server's parser..1...2...3...done. I needed a way to turn objects I could handle in C into XML nodes in such a file. This generator is for that purpose.
 
 ## Prerequisites
-+ libxml2
++ libxml2 (included in the repo but idealy you should edit the cmake to use a local and current version)
 + CMake
 + build essentials
 
