@@ -1,4 +1,0 @@
-/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/build/CMakeFiles/edit_cache.dir
-/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/build/CMakeFiles/DATALOG_OPCUA.dir
-/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/build/CMakeFiles/rebuild_cache.dir
-/home/alxhoff/git/GitHub/OPC-UA-XML-Generator/build/CMakeFiles/EXAMPLE.dir
