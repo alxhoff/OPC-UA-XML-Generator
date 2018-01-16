@@ -1,3 +1,5 @@
+__Still being developed, by no means stable.__
+
 # OPC UA Server XML Generator
 This is a dumb (meaning you have to implement the generation logic) XML generator to generate XML configuration files for OPC UA server.
 
@@ -53,7 +55,9 @@ I wrote this quickly and dirtily, so excuse the mess.
 + ~~Check these two above exsists~~
 + Removing reference from objects
 + ~~Reference search~~
-+ ~~Destoryer functions~~
++ ~~Destructor functions~~
++ Check NOT_USED functionality in all cases
++ Default namespace values
 
 ## Objects
 
@@ -82,6 +86,7 @@ Node attributes are attributes that are connected with each of the main objects:
 Each main object type also has attributes that are unique to its type, each object contains another datatype that clusters that object's type specific attributes.
 
 ## How the generator works
+__Please see macro section for macro (easier) interface__
 
 In the OPC UA XML server config, all objects (being `<UAObjectType`>, `<UAObject`>, `<UAMethod`> and `<UAVariable`>) are children of the root XML node. As such there is no need to create parent-child relationships within the XML generator, making the XML generator "dumb" in that it does not control and sort of object relationships. it just prints what it is fed into the root node of the XML document. All objects need to be created by calling creation functions, eg.
 ```c
@@ -107,3 +112,10 @@ This will add the reference object to the end of the variable object's reference
 tmp_variable->create_references(tmp_variable);
 ```
 This will create an XML representation of the variable.
+
+## Macros
+I am slowly implementing a macro interface to speed up use.
+
+There are two macros to create an OPC UA node and add references to it. They are ```QUICK_CREATE_OPCUA_THING``` where one must give the name of the node object that you wish to create, the type, namespace, id, browse and display name. Then using the ```QUICK_CREATE_REFERENCE``` macro one can specify the tmp reference object to be used, the parent node, parent node type, reference type (string literal), namespace, id and boolean IsForward (```true``` or ```false```).
+
+A node can be made the root node by calling the ```MAKE_ROOT_NODE``` macro and a node or reference can be generated in XML using any of the following: ```CREATE_REFERENCES```,```CREATE_NODE``` or ```CREATE_NODE_AND_REFS```.
