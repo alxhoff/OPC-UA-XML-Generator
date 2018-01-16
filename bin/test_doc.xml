@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE UANodeSet SYSTEM "dtdIsHere">
-<UANodeSet>
+<UANodeSet xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
   <NamespaceUris>
-    <Uri>urn:UnifiedAutomation:CppDemoServer:BuildingAutomation</Uri>
+    <Uri>urn:EDDMappingDemo</Uri>
   </NamespaceUris>
   <Aliases>
     <Alias Alias="Boolean">i=1</Alias>
@@ -43,9 +42,4 @@
     <Alias Alias="EnumValueType">i=7594</Alias>
     <Alias Alias="TimeZoneDataType">i=8912</Alias>
   </Aliases>
-  <Extensions>
-    <Extension>
-      <ModelInfo Tool="UaModeler" Hash="T9MjgfInUChe45aJYm9rKw==" Version="1.4.0"/>
-    </Extension>
-  </Extensions>
 </UANodeSet>

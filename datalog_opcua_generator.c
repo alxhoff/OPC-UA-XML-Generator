@@ -295,6 +295,26 @@ void datalog_opcua_save_deinit_doc(void)
     xmlMemoryDump();
 }
 
+DL_OPCUA_ERR_t datalog_opcua_add_schemas(xmlNodePtr nodeSet_node)
+{
+#if USE_XMLNS_UAX == 1 
+    xmlNewProp(nodeSet_node, BAD_CAST "xmlns:uax", BAD_CAST "http://opcfoundation.org/UA/2008/02/Types.xsd");
+#endif
+
+#if USE_XMLNS == 1
+    xmlNewProp(nodeSet_node, BAD_CAST "xmlns", BAD_CAST "http://opcfoundation.org/UA/2011/03/UANodeSet.xsd");
+#endif
+
+#if USE_XMLNS_XSD == 1
+    xmlNewProp(nodeSet_node, BAD_CAST "xmlns:xsd", BAD_CAST "http://www.w3.org/2001/XMLSchema");
+#endif
+
+#if USE_XMLNS_XSI == 1
+    xmlNewProp(nodeSet_node, BAD_CAST "xmlns:xsi", BAD_CAST "http://www.w3.org/2001/XMLSchema-instance");
+#endif
+    return DL_OPCUA_OK; 
+}
+
 opcua_document_t* datalog_opcua_create_document(char* filename, char* version)
 {
     opcua_document_t* ret = (opcua_document_t*)malloc(sizeof(opcua_document_t));
@@ -312,6 +332,8 @@ opcua_document_t* datalog_opcua_create_document(char* filename, char* version)
     ret->root_node = xmlNewNode(NULL, BAD_CAST "UANodeSet");
     xmlDocSetRootElement(ret->document, ret->root_node);
 
+    datalog_opcua_add_schemas(ret->root_node);
+
     return ret;
 }
 
@@ -326,8 +348,8 @@ DL_OPCUA_ERR_t datalog_opcua_init_doc(void)
             XML_FILE_VERSION); 
 
 
-    xmlCreateIntSubset(opcua_document->document, BAD_CAST "UANodeSet", 
-            NULL, BAD_CAST "dtdIsHere");
+    //xmlCreateIntSubset(opcua_document->document, BAD_CAST "UANodeSet", 
+    //        NULL, BAD_CAST "dtdIsHere");
 
     tmp_node = xmlNewChild(opcua_document->root_node, NULL, 
             BAD_CAST "NamespaceUris", NULL);
@@ -343,6 +365,7 @@ DL_OPCUA_ERR_t datalog_opcua_init_doc(void)
         i++;
     }
     
+    /*
     tmp_parent = xmlNewChild(opcua_document->root_node, NULL, 
             BAD_CAST "Extensions", NULL);
     tmp_parent = xmlNewChild(tmp_parent, NULL, BAD_CAST "Extension", NULL);
@@ -350,6 +373,7 @@ DL_OPCUA_ERR_t datalog_opcua_init_doc(void)
     xmlNewProp(tmp_child, BAD_CAST "Tool", BAD_CAST "UaModeler");
     xmlNewProp(tmp_child, BAD_CAST "Hash", BAD_CAST "T9MjgfInUChe45aJYm9rKw==");
     xmlNewProp(tmp_child, BAD_CAST "Version", BAD_CAST "1.4.0");
+    */
 
     return DL_OPCUA_OK;
 }

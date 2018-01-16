@@ -33,9 +33,10 @@
 #ifndef __DATALOG_OPCUA_GENERATOR_H__
 #define __DATALOG_OPCUA_GENERATOR_H__
 
+#include <stdint.h>
+
 #include "libxml/parser.h"
 #include "libxml/tree.h"
-#include <stdint.h>
 
 #ifndef bool
 #define bool signed char
@@ -56,7 +57,11 @@
 */
 #define XML_FILE_VERSION    "1.0"
 
-#define NAMESPACE_URI       "urn:UnifiedAutomation:CppDemoServer:BuildingAutomation"
+#define NAMESPACE_URI       "urn:EDDMappingDemo"
+#define USE_XMLNS_UAX       1 //opcua type
+#define USE_XMLNS           1 //node set
+#define USE_XMLNS_XSD       0 //w3
+#define USE_XMLNS_XSI       0 //w3
 
 #define FOR_EACH_TYPE_W_LABEL(FUNC)     FUNC(object_type, UAObjectType)         \
                                         FUNC(variable, UAVariable)              \
