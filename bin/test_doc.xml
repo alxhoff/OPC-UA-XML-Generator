@@ -42,4 +42,13 @@
     <Alias Alias="EnumValueType">i=7594</Alias>
     <Alias Alias="TimeZoneDataType">i=8912</Alias>
   </Aliases>
+  <UAObject NodeId="ns=1;i=1" BrowseName="1:EDDfile">
+    <DisplayName>EDDfile</DisplayName>
+    <References>
+      <Reference ReferenceType="Organizes" IsForward="false">i=85</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;i=2" BrowseName="TestVarBrowseName">
+    <DisplayName>TestVarDispName</DisplayName>
+  </UAVariable>
 </UANodeSet>

@@ -1237,7 +1237,7 @@ opcua_node_id_t* datalog_opcua_create_node_id(void)
     ret->set_historizing = &self_set_variable_historizing;          \
 
 #define object_CREATE_OBJECT        \
-    ret->object_attributes->event_notifier = -1;                    \
+    ret->object_attributes->event_notifier = 0;                    \
     ret->set_event_notifier = &self_set_object_event_notifier;
 
 #define variable_type_CREATE_OBJECT \
@@ -1395,6 +1395,21 @@ char* datalog_opcua_parse_id_s(char* id)
     return 0;
 }
 
+#define CREATE_OPCUA_THING( thing_name, type, namespace, id, browse_name, display_name) \
+    opcua_##type##_t* thing_name = datalog_opcua_create_##type();                       \
+    thing_name->set_node_id_i(thing_name, id);                                          \
+    thing_name->set_node_id_ns(thing_name, namespace);                                  \
+    thing_name->set_browse_name(thing_name, #browse_name);                              \
+    thing_name->set_display_name(thing_name, #display_name);                            \
+    
+
+#define MAKE_ROOT_NODE( node, type)                                                     \
+    opcua_reference_t* root_node_ref = datalog_opcua_create_reference();                \
+    root_node_ref->set_id_i(root_node_ref, 85);                                         \
+    root_node_ref->set_type(root_node_ref, "Organizes");                                \
+    root_node_ref->set_is_forward(root_node_ref, false);                                \
+    root_node_ref->add_reference(root_node_ref, node, DL_OPC_##type);
+
 //RUNTIME
 void datalog_opcua_runtime(void)
 {
@@ -1405,6 +1420,16 @@ void datalog_opcua_runtime(void)
     if(ret != DL_OPCUA_OK) return;
 
 //TEST CODE
+    CREATE_OPCUA_THING( test_object, object, 1, 1, 1:EDDfile, EDDfile)    
+
+    MAKE_ROOT_NODE(test_object, object)
+
+    test_object->create_node(test_object);
+    test_object->create_references(test_object);
+
+    CREATE_OPCUA_THING( test_var, variable, 1, 2, TestVarBrowseName, TestVarDispName) 
+    test_var->create_node(test_var);
+
 //TEST CODE END
 
     datalog_opcua_save_deinit_doc();
