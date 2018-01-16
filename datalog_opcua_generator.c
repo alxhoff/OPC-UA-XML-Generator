@@ -539,8 +539,9 @@ DL_OPCUA_ERR_t datalog_opcua_set_id_s(opcua_node_id_t* id, char* value)
 }
 
 DL_OPCUA_ERR_t datalog_opcua_set_id_ns(opcua_node_id_t* id, int ns)
-{
-    id->ns = ns;
+{   
+    if(ns == -1) id->ns = 0;
+    else id->ns = ns;
     return DL_OPCUA_OK;
 }
 
@@ -1106,7 +1107,7 @@ DL_OPCUA_ERR_t datalog_opcua_add_id_contents(xmlNodePtr node, opcua_node_id_t* i
 {
     char buffer[32]; 
 
-    if((id->i) != 0 && (id->ns == 0)){
+    if((id->i) != 0 && ((id->ns == 0) || (id->ns == -1))){
         sprintf(buffer, "i=%d", id->i);                
         xmlNodeSetContent(node, BAD_CAST buffer);
     }else if((id->i) == 0 && (id->ns != 0)){
@@ -1141,7 +1142,7 @@ DL_OPCUA_ERR_t datalog_opcua_add_id_attribute(xmlNodePtr node, char* attribute,
 
     xmlAttrPtr tmp_attr = NULL; 
 
-    if((id->i) != 0 && (id->ns == 0)){
+    if((id->i) != 0 && ((id->ns == 0) || (id->ns == -1))){
         tmp_attr = xmlNewProp(node, BAD_CAST attribute, NULL);
         sprintf(buffer, "i=%d", id->i);                
         xmlSetProp(node, BAD_CAST attribute, BAD_CAST buffer);
@@ -1395,13 +1396,22 @@ char* datalog_opcua_parse_id_s(char* id)
     return 0;
 }
 
-#define CREATE_OPCUA_THING( thing_name, type, namespace, id, browse_name, display_name) \
+#define NOT_USED -1
+
+#define QUICK_CREATE_OPCUA_THING( thing_name, type, namespace, id, browse_name, display_name) \
     opcua_##type##_t* thing_name = datalog_opcua_create_##type();                       \
     thing_name->set_node_id_i(thing_name, id);                                          \
     thing_name->set_node_id_ns(thing_name, namespace);                                  \
     thing_name->set_browse_name(thing_name, #browse_name);                              \
-    thing_name->set_display_name(thing_name, #display_name);                            \
-    
+    thing_name->set_display_name(thing_name, #display_name);                            
+   
+#define QUICK_CREATE_REFERENCE( tmp_ref_object, parent_node, parent_node_type, type, namespace, id, is_forward)           \
+    tmp_ref_object = datalog_opcua_create_reference();                \
+    tmp_ref_object->set_id_ns(tmp_ref_object, namespace);                                 \
+    tmp_ref_object->set_id_i(tmp_ref_object, id);                                         \
+    tmp_ref_object->set_type(tmp_ref_object, #type);                                      \
+    tmp_ref_object->set_is_forward(tmp_ref_object, is_forward);                           \
+    tmp_ref_object->add_reference(tmp_ref_object, parent_node, DL_OPC_##parent_node_type);
 
 #define MAKE_ROOT_NODE( node, type)                                                     \
     opcua_reference_t* root_node_ref = datalog_opcua_create_reference();                \
@@ -1409,6 +1419,16 @@ char* datalog_opcua_parse_id_s(char* id)
     root_node_ref->set_type(root_node_ref, "Organizes");                                \
     root_node_ref->set_is_forward(root_node_ref, false);                                \
     root_node_ref->add_reference(root_node_ref, node, DL_OPC_##type);
+
+#define CREATE_REFERENCES(node) \
+    node->create_references(node);
+
+#define CREATE_NODE(node)   \
+    node->create_node(node);
+
+#define CREATE_NODE_AND_REFS(node)  \
+    CREATE_NODE(node)   \
+    CREATE_REFERENCES(node) \
 
 //RUNTIME
 void datalog_opcua_runtime(void)
@@ -1420,17 +1440,22 @@ void datalog_opcua_runtime(void)
     if(ret != DL_OPCUA_OK) return;
 
 //TEST CODE
-    CREATE_OPCUA_THING( test_object, object, 1, 1, 1:EDDfile, EDDfile)    
+    opcua_reference_t* tmp_ref;
+    
+    QUICK_CREATE_OPCUA_THING(test_object, object, 1, 1, 1:EDDfile, EDDfile)    
 
     MAKE_ROOT_NODE(test_object, object)
+    QUICK_CREATE_REFERENCE(tmp_ref, test_object, object, HasComponent, 1, 2, NOT_USED)
+    QUICK_CREATE_REFERENCE(tmp_ref, test_object, object, HasTypeDefinition, NOT_USED, 61, NOT_USED)
 
-    test_object->create_node(test_object);
-    test_object->create_references(test_object);
+    CREATE_NODE_AND_REFS(test_object)
 
-    CREATE_OPCUA_THING( test_var, variable, 1, 2, TestVarBrowseName, TestVarDispName) 
-    test_var->create_node(test_var);
+    QUICK_CREATE_OPCUA_THING( test_var, variable, 1, 2, 1:TestVarBrowseName, TestVarDispName) 
+    QUICK_CREATE_REFERENCE(tmp_ref, test_var, variable, HasTypeDefinition, NOT_USED, 63, NOT_USED)
+    QUICK_CREATE_REFERENCE(tmp_ref, test_var, variable, HasComponent, 1, 1, false)
 
-//TEST CODE END
+    CREATE_NODE_AND_REFS(test_var)
+    //TEST CODE END
 
     datalog_opcua_save_deinit_doc();
 }
