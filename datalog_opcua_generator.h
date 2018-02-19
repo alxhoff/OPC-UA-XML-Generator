@@ -15,7 +15,7 @@
  *
 @verbatim
    ----------------------------------------------------------------------
-    Copyright (C) Alexander Hoffman, 2017
+    Copyright (C) Alexander Hoffman, 2018
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -46,6 +46,9 @@
 #endif
 #ifndef false
 #define false 0
+#endif
+#ifndef NOT_USED
+#define NOT_USED -1
 #endif
 
 /*
@@ -80,6 +83,95 @@
                             FUNC(reference_type)        \
                             FUNC(data_type)             \
                             FUNC(view)                 
+
+#define DATA_TYPES(FUNC)            \
+            FUNC(INVAL)         \
+            FUNC(BOOLEAN)       \
+            FUNC(SBYTE)         \
+            FUNC(BYTE)          \
+            FUNC(INT16)         \
+            FUNC(UINT16)        \
+            FUNC(INT32)         \
+            FUNC(UINT32)        \
+            FUNC(INT64)         \
+            FUNC(UINT64)        \
+            FUNC(FLOAT)         \
+            FUNC(DOUBLE)        \
+            FUNC(STATUSCODE)    \
+            FUNC(STRING)        \
+            FUNC(DATETIME)      \
+            FUNC(GUID)          \
+            FUNC(BYTESTRING)    \
+            FUNC(XMLELEMENT)    \
+            FUNC(NODEID)        \
+            FUNC(ENODEID)       \
+            FUNC(QUALIFIEDNAME) \
+            FUNC(LOCALIZEDTEXT) \
+            FUNC(NUMERICRANGE)
+
+#define DATA_TYPES_VAL(FUNC)            \
+            FUNC(INVAL              = 0)    /* invalid */   \
+            FUNC(BOOLEAN            = 1)    /* two-state logical value*/            \
+            FUNC(SBYTE              = 2)    /* int val between -128 and 127  */     \
+            FUNC(BYTE               = 3)    /* int val between 0 and 255 */         \
+            FUNC(INT16              = 4)    /* int val between -32768 and 32767 */  \
+            FUNC(UINT16             = 5)    /* int value between 0 and 65535 */     \
+            FUNC(INT32              = 6)    /* int value between -2 147 483 648 and 2 147 483 647 */    \
+            FUNC(UINT32             = 7)    /* int value between 0 and 4 294 967 295 */ \
+            FUNC(INT64              = 8)    /* int value between -9 223 372 036 854 775 808 and 9 233 372 036 854 775 807 */   \
+            FUNC(UINT64             = 9)    /* int value between 0 and 18 446 744 073 709 551 615 */    \
+            FUNC(FLOAT              = 10)   /* 32 bit floating point */ \
+            FUNC(DOUBLE             = 11)   /* 64 bit floating point */ \
+            FUNC(STATUSCODE         = 12)   /* 32 bit error or condition code */    \
+            FUNC(STRING             = 13)   /* sequence of unicode characters */    \
+            FUNC(DATETIME           = 14)   /* 64bit int that counts nanosecs since jan 1st, 1601 */    \
+            FUNC(GUID               = 15)   /* 16 byte value that is used as a unique identifier */ \
+            FUNC(BYTESTRING         = 16)   /* sequence of octets */    \
+            FUNC(XMLELEMENT         = 17)   /* xml element */   \
+            FUNC(NODEID             = 18)   /* identifies a node in the OPC UA namespace */ \
+            FUNC(ENODEID            = 19)   /* expanded node id */  \
+            FUNC(QUALIFIEDNAME      = 20)   /* a name qualified by a namespace */   \
+            FUNC(LOCALIZEDTEXT      = 21)   /* human readable text with optional locale identifier */   \
+            FUNC(NUMERICRANGE       = 22)   /* subset of array */   \
+
+typedef struct OPCUA_string OPCUA_string_t;
+
+struct OPCUA_string{
+    size_t length;
+    char* data;
+};
+
+#define DATA_TYPES_ENUM(foo) OPCUA_DT_##foo ,
+
+#define DATA_TYPES_STRING(foo) #foo ,
+
+/**
+ * @enum
+ * @brief
+ * */
+typedef enum {DATA_TYPES_VAL(DATA_TYPES_ENUM)} opcua_data_types_e;
+
+#define OPCUA_AL_VAL(FUNC)  \
+        FUNC(AL_NONE                    = 0x00)     \
+        FUNC(AL_CURRENT_READ            = 0x01)     \
+        FUNC(AL_CURRENT_WRITE           = 0x02)     \
+        FUNC(AL_CURRENT_READ_OR_WRITE   = 0x03)     \
+        FUNC(AL_HISTORY_READ            = 0x04)     \
+        FUNC(AL_HISTORY_WRITE           = 0x08)     \
+        FUNC(AL_HISTORY_READ_OR_WRITE   = 0x0C)     \
+        FUNC(AL_SEMANTIC_CHANGE         = 0x1C)     \
+        FUNC(AL_STATUS_WRITE            = 0x20)     \
+        FUNC(AL_TIMESTAMP_WRITE         = 0x40)     
+
+#define OPCUA_AL_ENUM(foo)  OPCUA_AL_##foo ,
+
+#define OPCUA_AL_STRING(foo)    #foo ,
+
+/**
+* @enum
+* @brief
+* */
+typedef enum {OPCUA_AL_VAL(OPCUA_AL_ENUM)} opcua_al_e;
 
 /**
 * @enum DL_OPCUA_ERR_t
@@ -280,6 +372,13 @@ typedef struct opcua_method_attributes{
 
 typedef struct opcua_data_type opcua_data_type_t;
 
+typedef struct opcua_value opcua_value_t;
+
+struct opcua_value{
+    void* value;
+    opcua_data_types_e type;
+};
+
 /**
 * @typedef opcua_variable_attributes_t
 * @brief Typdef for opcua_variable_attributes
@@ -289,8 +388,8 @@ typedef struct opcua_data_type opcua_data_type_t;
 * @brief Attributes specific to a \<UAVariable\>node
 */
 typedef struct opcua_variable_attributes{
-    void* value;
-    opcua_node_id_t data_type;     /**< Variable's "DataType" attribute*/ 
+    opcua_value_t value;
+    char* data_type;     /**< Variable's "DataType" attribute*/ 
     int32_t value_rank;             /**< Variable's "ValueRank" attribute*/
     uint32_t array_dimensions;      /**< Variable's "ArrayDimensions" attribute*/
     unsigned char access_level;
@@ -320,8 +419,8 @@ typedef struct opcua_object_attributes{
 * @brief Attributes specific to a 
 */
 typedef struct opcua_variable_type_attributes{
-    void* value;
-    opcua_node_id_t data_type;
+    opcua_value_t value;
+    char* data_type;
     uint32_t array_dimensions;
     int32_t value_rank;
     bool is_abstract;
@@ -375,7 +474,7 @@ typedef struct opcua_view_attributes{
     DL_OPCUA_ERR_t (*set_user_executable)(opcua_method_t*,bool);                                                                \
 
 #define variable_CREATE_STRUCT      \
-    DL_OPCUA_ERR_t (*set_value)(opcua_variable_t*,void*);                                                                       \
+    DL_OPCUA_ERR_t (*set_value)(opcua_variable_t*,void*,opcua_data_types_e);          \
     DL_OPCUA_ERR_t (*set_data_type)(opcua_variable_t*,char*);               /**< Sets the variable's data type attribute*/      \
     DL_OPCUA_ERR_t (*set_value_rank)(opcua_variable_t*,int32_t);            /**< Sets the variable's value rank attribute*/     \
     DL_OPCUA_ERR_t (*set_array_dimensions)(opcua_variable_t*,uint32_t);     /**< Sets the variable's array dimensions attribute*/\
@@ -388,7 +487,7 @@ typedef struct opcua_view_attributes{
     DL_OPCUA_ERR_t (*set_event_notifier)(opcua_object_t*, unsigned char);             
     
 #define variable_type_CREATE_STRUCT \
-    DL_OPCUA_ERR_t (*set_value)(opcua_variable_type_t*,void*);                  \
+    DL_OPCUA_ERR_t (*set_value)(opcua_variable_type_t*,void*,opcua_data_types_e);                  \
     DL_OPCUA_ERR_t (*set_data_type)(opcua_variable_type_t*,char*);              \
     DL_OPCUA_ERR_t (*set_array_dimensions)(opcua_variable_type_t*,uint32_t);    \
     DL_OPCUA_ERR_t (*set_value_rank)(opcua_variable_type_t*,int32_t);           \
@@ -439,6 +538,7 @@ struct opcua_##TYPE{                                                            
 FOR_EACH_TYPE_W_LABEL(OBJECT_STRUCT)
 
 //SERVER CONFIG
+/*
 opcua_reference_t object_type_array[] = {
     {.type = "HasSubtype",
         .id = {.i = 58},
@@ -481,47 +581,7 @@ opcua_reference_t object_type_array[] = {
     },
     {.type = NULL}
 };
-
-alias_pair_t alias_array[] = {
-    {"Boolean", 1},
-    {"SByte", 2},
-    {"Byte", 3},
-    {"Int16", 4},
-    {"UInt16", 5},
-    {"Int32", 6},
-    {"UInt32", 7},
-    {"Int64", 8},
-    {"UInt64", 9},
-    {"Float", 10},
-    {"Double", 11},
-    {"String", 12},
-    {"DateTime", 13},
-    {"Guid", 14},
-    {"ByteString", 15},
-    {"XmlElement", 16},
-    {"NodeId", 17},
-    {"StatusCode", 19},
-    {"QualifiedName", 20},
-    {"LocalizedText", 21},
-    {"Number", 26},
-    {"Integer", 27},
-    {"UInteger", 28},
-    {"Organizes", 35},
-    {"HasModellingRule", 37},
-    {"HasTypeDefinition", 40},
-    {"HasSubtype", 45},
-    {"HasProperty", 46},
-    {"HasComponent", 47},
-    {"NodeClass", 257},
-    {"Duration", 290},
-    {"UtcTime", 294},
-    {"Argument", 296},
-    {"Range", 884},
-    {"EUInformation", 887},
-    {"EnumValueType", 7594},
-    {"TimeZoneDataType", 8912},
-    {NULL, 0},
-};
+*/
 //END SERVER CONFIG
 
 /**

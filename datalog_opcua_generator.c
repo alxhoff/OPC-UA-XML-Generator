@@ -34,8 +34,8 @@
                             SET_DATA_TYPE(variable)     \
                             SET_VALUE_RANK(variable)    \
                             SET_ARRAY_DIM(variable)     \
-                            SET_ACCESS_LEVEL(variable)  \
-                            SET_U_ACCESS_LEVEL(variable)\
+                            SET_ACC_LEVEL(variable)     \
+                            SET_U_ACC_LEVEL(variable)   \
                             SET_MIN_SAMP_INT(variable)  \
                             SET_HISTORIZING(variable)   
 
@@ -147,14 +147,194 @@
                                 self->TYPE##_attributes->is_abstract = abstract;                \
                                 return DL_OPCUA_OK;}
 
+/*
+DL_OPCUA_ERR_t self_set_variable_type_is_abstract(opcua_data_type_t* self, bool abstract){}
+DL_OPCUA_ERR_t self_set_reference_type_is_abstract(opcua_data_type_t* self, bool abstract){}
+DL_OPCUA_ERR_t self_set_object_type_is_abstract(opcua_data_type_t* self, bool abstract){}
+DL_OPCUA_ERR_t self_set_data_type_is_abstract(
+                                opcua_data_type_t* self, bool abstract){                         
+                                if(self->data_type_attributes == NULL) return DL_OPCUA_INVAL;      
+                                self->data_type_attributes->is_abstract = abstract;                
+                                return DL_OPCUA_OK;
+                                }
+*/
+#define ALLOC_AND_SET_VALUE(TYPE, d_type, casted)   \
+                                self->TYPE##_attributes->value.value =  \
+                                    (d_type*)malloc(sizeof(d_type));        \
+                                if(self->TYPE##_attributes->value.value == NULL)        \
+                                    return DL_OPCUA_MEM;                                \
+                                *(d_type*)self->TYPE##_attributes->value.value = (d_type)casted;    \
+/*                                                                
 #define SET_VALUE(TYPE)         DL_OPCUA_ERR_t self_set_##TYPE##_value(                         \
-                                opcua_##TYPE##_t* self, void* value){                           \
-                                    /*TODO*/                                                    \
+                                opcua_##TYPE##_t* self, void* value, opcua_data_types_e type){  \
+                                if(self->TYPE##_attributes == NULL) return DL_OPCUA_INVAL;      \
+                                if(!strcmp((char*)value, "NOT_USED")) return DL_OPCUA_OK;       \
+                                if(!value) free(value);                                         \
+                                switch(type){                                                   \
+                                    case OPCUA_DT_BOOLEAN:                                      \
+                                        ALLOC_AND_SET_VALUE(TYPE, bool)                         \
+                                        break;                                                  \
+                                    case OPCUA_DT_STRING:                                       \
+                                        self->TYPE##_attributes->value.value =                  \
+                                        (char*)malloc(sizeof(char) * (strlen(value) + 1));      \
+                                        if(self->TYPE##_attributes->value.value == NULL)        \
+                                            return DL_OPCUA_MEM;                                \
+                                        strcpy((char*)self->TYPE##_attributes->value.value,     \
+                                                (char*)value);                                  \
+                                    case OPCUA_DT_SBYTE:                                        \
+                                        ALLOC_AND_SET_VALUE(TYPE, signed char)                  \
+                                        break;                                                  \
+                                    case OPCUA_DT_BYTE:                                         \
+                                        ALLOC_AND_SET_VALUE(TYPE, unsigned char)                \
+                                        break;                                                  \
+                                    case OPCUA_DT_INT16:                                        \
+                                        ALLOC_AND_SET_VALUE(TYPE, int16_t)                      \
+                                        break;                                                  \
+                                    case OPCUA_DT_UINT16:                                       \
+                                        ALLOC_AND_SET_VALUE(TYPE, uint16_t)                     \
+                                        break;                                                  \
+                                    case OPCUA_DT_INT32:                                        \
+                                        ALLOC_AND_SET_VALUE(TYPE, int32_t)                      \
+                                        break;                                                  \
+                                    case OPCUA_DT_UINT32:                                       \
+                                        ALLOC_AND_SET_VALUE(TYPE, uint32_t)                     \
+                                        break;                                                  \
+                                    case OPCUA_DT_INT64:                                        \
+                                        ALLOC_AND_SET_VALUE(TYPE, int64_t)                      \
+                                        break;                                                  \
+                                    case OPCUA_DT_UINT64:                                       \
+                                        ALLOC_AND_SET_VALUE(TYPE, uint64_t)                     \
+                                        break;                                                  \
+                                    case OPCUA_DT_FLOAT:                                        \
+                                        ALLOC_AND_SET_VALUE(TYPE, float)                        \
+                                        break;                                                  \
+                                    case OPCUA_DT_DOUBLE:                                       \
+                                        ALLOC_AND_SET_VALUE(TYPE, double)                       \
+                                        break;                                                  \
+                                    default: break;}                                            \
+                                self->TYPE##_attributes->value.type = type;                     \
+                                return DL_OPCUA_OK;}                                            \
+*/
+#define SET_VALUE(TYPE)      
+
+        DL_OPCUA_ERR_t self_set_variable_type_value(                         \
+                                opcua_variable_type_t* self, void* value, opcua_data_types_e type){  \
+                                if(self->variable_type_attributes == NULL) return DL_OPCUA_INVAL;      \
+                                if(!strcmp((char*)value, "NOT_USED") || !strcmp((char*)value, "")){                          \
+                                    self->variable_type_attributes->value.type = OPCUA_DT_INVAL;\
+                                    return DL_OPCUA_OK;}                                        \
+                                switch(type){                                                   \
+                                    case OPCUA_DT_BOOLEAN:                                      \
+                                        if(!strcmp((char*)value, "true")){                      \
+                                            ALLOC_AND_SET_VALUE(variable_type, bool, true)      \
+                                        }                                                       \
+                                        else if(!strcmp((char*)value, "false")){                \
+                                            ALLOC_AND_SET_VALUE(variable_type, bool, false)     \
+                                        }                                                       \
+                                        break;                                                  \
+                                    case OPCUA_DT_STRING:                                       \
+                                        self->variable_type_attributes->value.value =                  \
+                                        (char*)malloc(sizeof(char) * (strlen((char*)value) + 1));      \
+                                        if(self->variable_type_attributes->value.value == NULL)        \
+                                            return DL_OPCUA_MEM;                                \
+                                        strcpy((char*)self->variable_type_attributes->value.value,     \
+                                                (char*)value);                                  \
+                                        break;
+                                    case OPCUA_DT_SBYTE:                                        \
+                                        ALLOC_AND_SET_VALUE(variable_type, signed char, atoi((char*)value))                  \
+                                        break;                                                  \
+                                    case OPCUA_DT_BYTE:                                         \
+                                        ALLOC_AND_SET_VALUE(variable_type, unsigned char, atoi((char*)value))                \
+                                        break;                                                  \
+                                    case OPCUA_DT_INT16:                                        \
+                                        ALLOC_AND_SET_VALUE(variable_type, int16_t, atoi((char*)value))                      \
+                                        break;                                                  \
+                                    case OPCUA_DT_UINT16:                                       \
+                                        ALLOC_AND_SET_VALUE(variable_type, uint16_t, atoi((char*)value))                     \
+                                        break;                                                  \
+                                    case OPCUA_DT_INT32:                                        \
+                                        ALLOC_AND_SET_VALUE(variable_type, int32_t, atoi((char*)value))                      \
+                                        break;                                                  \
+                                    case OPCUA_DT_UINT32:                                       \
+                                        ALLOC_AND_SET_VALUE(variable_type, uint32_t, atoi((char*)value))                     \
+                                        break;                                                  \
+                                    case OPCUA_DT_INT64:                                        \
+                                        ALLOC_AND_SET_VALUE(variable_type, int64_t, atoi((char*)value))                      \
+                                        break;                                                  \
+                                    case OPCUA_DT_UINT64:                                       \
+                                        ALLOC_AND_SET_VALUE(variable_type, uint64_t, atoi((char*)value))                     \
+                                        break;                                                  \
+                                    case OPCUA_DT_FLOAT:                                        \
+                                        ALLOC_AND_SET_VALUE(variable_type, float, atof((char*)value))                        \
+                                        break;                                                  \
+                                    case OPCUA_DT_DOUBLE:                                       \
+                                        ALLOC_AND_SET_VALUE(variable_type, double, atof((char*)value))                       \
+                                        break;                                                  \
+                                    default: break;}                                            \
+                                self->variable_type_attributes->value.type = type;                     \
+                                return DL_OPCUA_OK;}                                            \
+
+DL_OPCUA_ERR_t self_set_variable_value(                         \
+                                opcua_variable_t* self, void* value, opcua_data_types_e type){  \
+                                if(self->variable_attributes == NULL) return DL_OPCUA_INVAL;      \
+                                if(!strcmp((char*)value, "NOT_USED") || !strcmp((char*)value, "")){                          \
+                                    self->variable_attributes->value.type = OPCUA_DT_INVAL;\
+                                    return DL_OPCUA_OK; }                                        \
+                                switch(type){                                                   \
+                                    case OPCUA_DT_BOOLEAN:                                      \
+                                        ALLOC_AND_SET_VALUE(variable, bool, (char*)value)                         \
+                                        break;                                                  \
+                                    case OPCUA_DT_STRING:                                       \
+                                        self->variable_attributes->value.value =                  \
+                                        (char*)malloc(sizeof(char) * (strlen((char*)value) + 1));      \
+                                        if((char*)self->variable_attributes->value.value == NULL)        \
+                                            return DL_OPCUA_MEM;                                \
+                                        strcpy((char*)self->variable_attributes->value.value,     \
+                                                (char*)value);                                  \
+                                        break;
+                                    case OPCUA_DT_SBYTE:                                        \
+                                        ALLOC_AND_SET_VALUE(variable, signed char, atoi((char*)value))                  \
+                                        break;                                                  \
+                                    case OPCUA_DT_BYTE:                                         \
+                                        ALLOC_AND_SET_VALUE(variable, unsigned char, atoi((char*)value))                \
+                                        break;                                                  \
+                                    case OPCUA_DT_INT16:                                        \
+                                        ALLOC_AND_SET_VALUE(variable, int16_t, atoi((char*)value))                      \
+                                        break;                                                  \
+                                    case OPCUA_DT_UINT16:                                       \
+                                        ALLOC_AND_SET_VALUE(variable, uint16_t, atoi((char*)value))                     \
+                                        break;                                                  \
+                                    case OPCUA_DT_INT32:                                        \
+                                        ALLOC_AND_SET_VALUE(variable, int32_t, atoi((char*)value))                      \
+                                        break;                                                  \
+                                    case OPCUA_DT_UINT32:                                       \
+                                        ALLOC_AND_SET_VALUE(variable, uint32_t, atoi((char*)value))                     \
+                                        break;                                                  \
+                                    case OPCUA_DT_INT64:                                        \
+                                        ALLOC_AND_SET_VALUE(variable, int64_t, atoi((char*)value))                      \
+                                        break;                                                  \
+                                    case OPCUA_DT_UINT64:                                       \
+                                        ALLOC_AND_SET_VALUE(variable, uint64_t, atoi((char*)value))                     \
+                                        break;                                                  \
+                                    case OPCUA_DT_FLOAT:                                        \
+                                        ALLOC_AND_SET_VALUE(variable, float, atof((char*)value))                        \
+                                        break;                                                  \
+                                    case OPCUA_DT_DOUBLE:                                       \
+                                        ALLOC_AND_SET_VALUE(variable, double, atof((char*)value))                       \
+                                        break;                                                  \
+                                    default: break;}                                            \
+                                self->variable_attributes->value.type = type;                     \
                                 return DL_OPCUA_OK;}                                            \
 
 #define SET_DATA_TYPE(TYPE)     DL_OPCUA_ERR_t self_set_##TYPE##_data_type(                     \
                                 opcua_##TYPE##_t* self, char* ID){                              \
-                                    /*TODO*/                                                    \
+                                if(self->TYPE##_attributes->data_type != NULL)                  \
+                                    free(self->TYPE##_attributes->data_type);                   \
+                                self->TYPE##_attributes->data_type =                            \
+                                    (char*)malloc(sizeof(char) * (strlen(ID) + 1));             \
+                                if(self->TYPE##_attributes->data_type == NULL)                  \
+                                    return DL_OPCUA_MEM;                                        \
+                                strcpy(self->TYPE##_attributes->data_type, ID);                 \
                                 return DL_OPCUA_OK;}                                            \
 
 #define SET_VALUE_RANK(TYPE)    DL_OPCUA_ERR_t self_set_##TYPE##_value_rank(                    \
@@ -169,17 +349,17 @@
                                 self->TYPE##_attributes->array_dimensions = ad;                 \
                                 return DL_OPCUA_OK;}
 
-#define SET_ACCESS_LEVEL(TYPE)  DL_OPCUA_ERR_t self_set_##TYPE##_access_level(                  \
+#define SET_ACC_LEVEL(TYPE)     DL_OPCUA_ERR_t self_set_##TYPE##_access_level(                  \
                                 opcua_##TYPE##_t* self, unsigned char al){                      \
                                 if(self->TYPE##_attributes == NULL) return DL_OPCUA_INVAL;      \
                                 self->TYPE##_attributes->access_level = al;                     \
                                 return DL_OPCUA_OK;}
 
-#define SET_U_ACCESS_LEVEL(TYPE)    DL_OPCUA_ERR_t self_set_##TYPE##_user_access_level(         \
-                                    opcua_##TYPE##_t* self, unsigned char ual){                 \
-                                    if(self->TYPE##_attributes == NULL) return DL_OPCUA_INVAL;  \
-                                    self->TYPE##_attributes->user_access_level = ual;           \
-                                    return DL_OPCUA_OK;}
+#define SET_U_ACC_LEVEL(TYPE)   DL_OPCUA_ERR_t self_set_##TYPE##_user_access_level(             \
+                                opcua_##TYPE##_t* self, unsigned char ual){                     \
+                                if(self->TYPE##_attributes == NULL) return DL_OPCUA_INVAL;      \
+                                self->TYPE##_attributes->user_access_level = ual;               \
+                                return DL_OPCUA_OK;}
 
 #define SET_MIN_SAMP_INT(TYPE)  DL_OPCUA_ERR_t self_set_##TYPE##_min_samp_interval(             \
                                 opcua_variable_t* self, double msi){                            \
@@ -280,6 +460,47 @@ FOR_EACH_TYPE(CREATE_REFERENCES_FUNCTIONS)
 
 FOR_EACH_TYPE(SELF_ADD_REF)
 
+ alias_pair_t datatype_array[] = {
+    {"Boolean", 1},
+    {"SByte", 2},
+    {"Byte", 3},
+    {"Int16", 4},
+    {"UInt16", 5},
+    {"Int32", 6},
+    {"UInt32", 7},
+    {"Int64", 8},
+    {"UInt64", 9},
+    {"Float", 10},
+    {"Double", 11},
+    {"String", 12},
+    {"DateTime", 13},
+    {"Guid", 14},
+    {"ByteString", 15},
+    {"XmlElement", 16},
+    {"NodeId", 17},
+    {"StatusCode", 19},
+    {"QualifiedName", 20},
+    {"LocalizedText", 21},
+    {"Number", 26},
+    {"Integer", 27},
+    {"UInteger", 28},
+    {"Organizes", 35},
+    {"HasModellingRule", 37},
+    {"HasTypeDefinition", 40},
+    {"HasSubtype", 45},
+    {"HasProperty", 46},
+    {"HasComponent", 47},
+    {"NodeClass", 257},
+    {"Duration", 290},
+    {"UtcTime", 294},
+    {"Argument", 296},
+    {"Range", 884},
+    {"EUInformation", 887},
+    {"EnumValueType", 7594},
+    {"TimeZoneDataType", 8912},
+    {NULL, 0},
+};
+
 //DOCUMENT FUNCTIONS
 void datalog_opcua_save_deinit_doc(void)
 {
@@ -358,10 +579,10 @@ DL_OPCUA_ERR_t datalog_opcua_init_doc(void)
     //ALIAS
     tmp_parent = xmlNewChild(opcua_document->root_node, NULL, BAD_CAST "Aliases", NULL);
 
-    while(alias_array[i].integer != 0){
-        sprintf(buff, "i=%d", alias_array[i].integer);
+    while(datatype_array[i].integer != 0){
+        sprintf(buff, "i=%d", datatype_array[i].integer);
         tmp_child = xmlNewChild(tmp_parent, NULL, BAD_CAST "Alias", BAD_CAST buff);
-        xmlNewProp(tmp_child, BAD_CAST "Alias",  BAD_CAST alias_array[i].name);
+        xmlNewProp(tmp_child, BAD_CAST "Alias",  BAD_CAST datatype_array[i].name);
         i++;
     }
     
@@ -591,22 +812,24 @@ DL_OPCUA_ERR_t datalog_opcua_create_node_attributes(xmlNodePtr node,
         xmlNodePtr display_name_node, opcua_node_attributes_t* attributes)
 {
     char buffer[32];
-    
-    DL_OPCUA_ERR_t ret = datalog_opcua_add_id_attribute(node, "ParentNodeId",
-        &attributes->parent_node_id);            
+    DL_OPCUA_ERR_t ret = DL_OPCUA_OK;
+
+    if(attributes->parent_node_id.i != 0)
+        ret = datalog_opcua_add_id_attribute(node, "ParentNodeId",
+            &attributes->parent_node_id);            
     if(ret != DL_OPCUA_OK) return DL_OPCUA_ATTR;
 
     ret = datalog_opcua_add_id_attribute(node, "NodeId",
         &attributes->node_id);            
     if(ret != DL_OPCUA_OK) return DL_OPCUA_ATTR;
     
-    if(attributes->browse_name != NULL)
+    if(attributes->browse_name != NULL && strcmp(attributes->browse_name, "NOT_USED"))
         xmlNewProp(node, BAD_CAST "BrowseName",
                 BAD_CAST attributes->browse_name);
     
-    if(display_name_node == NULL){
+    if(display_name_node == NULL && strcmp(attributes->display_name, "NOT_USED")){
         if(attributes->display_name != NULL)
-            display_name_node = xmlNewChild(node, NULL,
+            display_name_node = xmlNewTextChild(node, NULL,
                 BAD_CAST "DisplayName", BAD_CAST attributes->display_name);
     }else
         xmlNodeSetContent(display_name_node, 
@@ -614,12 +837,12 @@ DL_OPCUA_ERR_t datalog_opcua_create_node_attributes(xmlNodePtr node,
     
     if(attributes->user_write_mask != 0){
         sprintf(buffer, "%d", attributes->user_write_mask);
-        xmlNewProp(node, BAD_CAST "UserAccessLevel", BAD_CAST buffer);
+        xmlNewProp(node, BAD_CAST "UserWriteMask", BAD_CAST buffer);
     }
     
     if(attributes->write_mask != 0){
         sprintf(buffer, "%d", attributes->write_mask);
-        xmlNewProp(node, BAD_CAST "AccessLevel", BAD_CAST buffer);
+        xmlNewProp(node, BAD_CAST "WriteMask", BAD_CAST buffer);
     }
 
     return DL_OPCUA_OK;
@@ -653,23 +876,118 @@ DL_OPCUA_ERR_t datalog_opcua_create_node_method_attributes(opcua_method_t* metho
     return DL_OPCUA_OK;
 }
 
+//TODO test this
+const char* datalog_opcua_get_bool_string(bool val)
+{
+    if(val == 1) return "true";
+    else if(val == 0) return "false";
+    else return "inval";
+}
+
+DL_OPCUA_ERR_t datalog_opcua_add_value_node(xmlNodePtr node, opcua_value_t* value, 
+        xmlNodePtr val_node)
+{
+    char buffer[12] = {0};
+    switch(value->type){
+        case OPCUA_DT_STRING:
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:String", 
+                        BAD_CAST value->value);
+            break;
+        case OPCUA_DT_BOOLEAN:
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:Boolean", 
+                        BAD_CAST datalog_opcua_get_bool_string(*(bool*)value->value));
+            break;
+        case OPCUA_DT_BYTE:
+            sprintf(buffer, "%c", *(unsigned char*)value->value);
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:Byte", 
+                        BAD_CAST "Please implement code in generator:900");
+            break;
+        case OPCUA_DT_SBYTE:
+            sprintf(buffer, "%hhd", *(signed char*)value->value);
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:SByte", 
+                        BAD_CAST "Please implement code in generator:900");
+            break;
+        case OPCUA_DT_INT16:
+            sprintf(buffer, "%hu", *(int16_t*)value->value);
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:Int16", 
+                        BAD_CAST "Please implement code in generator:900");
+            break;
+        case OPCUA_DT_UINT16:
+            sprintf(buffer, "%hi", *(uint16_t*)value->value);
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:UInt16", 
+                        BAD_CAST "Please implement code in generator:900");
+            break;
+        case OPCUA_DT_INT32:
+            sprintf(buffer, "%d", *(int32_t*)value->value);
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:Int32", 
+                        BAD_CAST "Please implement code in generator:900");
+            break;
+        case OPCUA_DT_UINT32:
+            sprintf(buffer, "%u", *(uint32_t*)value->value);
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:UInt32", 
+                        BAD_CAST "Please implement code in generator:900");
+            break;
+        case OPCUA_DT_INT64:
+            sprintf(buffer, "%ld", *(int64_t*)value->value);
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:Int64", 
+                        BAD_CAST buffer);
+            break;
+        case OPCUA_DT_UINT64:
+            sprintf(buffer, "%lu", *(uint64_t*)value->value);
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:Uint64", 
+                        BAD_CAST buffer);
+            break;
+        case OPCUA_DT_FLOAT:
+            sprintf(buffer, "%f", *(float*)value->value);
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:Float", 
+                        BAD_CAST buffer);
+            break;
+        case OPCUA_DT_DOUBLE:
+            sprintf(buffer, "%f", *(double*)value->value);
+            xmlNewChild(val_node, NULL, BAD_CAST "uax:Double", 
+                        BAD_CAST buffer);
+            break;
+        default: 
+            xmlNewChild(val_node, NULL, BAD_CAST "ERROR", 
+                        BAD_CAST "Please implement code in generator:900");
+            break;
+    }
+    return DL_OPCUA_OK;
+}
+
 DL_OPCUA_ERR_t datalog_opcua_create_node_variable_attributes(opcua_variable_t* variable)
 {
     char buffer[32];
-
-    //TODO value
-
-    DL_OPCUA_ERR_t ret = datalog_opcua_add_id_attribute(variable->node, "DataType",
-            &variable->variable_attributes->data_type);
-    if(ret != DL_OPCUA_OK) return DL_OPCUA_ATTR;
-
+    DL_OPCUA_ERR_t ret = DL_OPCUA_OK;
+    
+    if(variable->variable_attributes->data_type != NULL)
+        xmlNewProp(variable->node, BAD_CAST "DataType",
+                BAD_CAST variable->variable_attributes->data_type);
+    
     if(variable->variable_attributes->array_dimensions != 0){
         sprintf(buffer, "%d", variable->variable_attributes->array_dimensions);
         xmlNewProp(variable->node, BAD_CAST "ArrayDimensions", BAD_CAST buffer);
     }
-    if(variable->variable_attributes->value_rank != 0){
+    if(variable->variable_attributes->value_rank != NOT_USED){
         sprintf(buffer, "%d", variable->variable_attributes->value_rank);
         xmlNewProp(variable->node, BAD_CAST "ValueRank", BAD_CAST buffer);
+    }
+
+    if(variable->variable_attributes->access_level != 0){
+        sprintf(buffer, "%d", variable->variable_attributes->access_level);
+        xmlNewProp(variable->node, BAD_CAST "AccessLevel", BAD_CAST buffer);
+    }
+
+    if(variable->variable_attributes->user_access_level != 0){
+        sprintf(buffer, "%d", variable->variable_attributes->user_access_level);
+        xmlNewProp(variable->node, BAD_CAST "UserAccessLevel", BAD_CAST buffer);
+    }
+    
+    if(variable->variable_attributes->value.type != OPCUA_DT_INVAL){
+        xmlNodePtr value_node = xmlNewChild(variable->node, NULL,
+            BAD_CAST "Value", BAD_CAST NULL);
+        datalog_opcua_add_value_node(variable->node, 
+                &variable->variable_attributes->value, value_node);
     }
 
     return DL_OPCUA_OK;
@@ -694,22 +1012,27 @@ DL_OPCUA_ERR_t datalog_opcua_create_node_variable_type_attributes(
 {
     char buffer[32];
 
-    //TODO value
-    
-    DL_OPCUA_ERR_t ret = datalog_opcua_add_id_attribute(variable_type->node, "DataType",
-            &variable_type->variable_type_attributes->data_type);
-    if(ret != DL_OPCUA_OK) return DL_OPCUA_ATTR;
+    if(variable_type->variable_type_attributes->value.type != OPCUA_DT_INVAL){
+        xmlNodePtr value_node = xmlNewChild(variable_type->node, NULL,
+                BAD_CAST "Value", BAD_CAST NULL);
+        datalog_opcua_add_value_node(variable_type->node,
+                &variable_type->variable_type_attributes->value, value_node);
+    }
+
+    if(variable_type->variable_type_attributes->data_type != NULL)
+        xmlNewProp(variable_type->node, BAD_CAST "DataType",
+                BAD_CAST variable_type->variable_type_attributes->data_type);
 
     if(variable_type->variable_type_attributes->array_dimensions != 0){
         sprintf(buffer, "%d", variable_type->variable_type_attributes->array_dimensions);
         xmlNewProp(variable_type->node, BAD_CAST "ArrayDimensions", BAD_CAST buffer);
     }
-    if(variable_type->variable_type_attributes->value_rank != 0){
+    if(variable_type->variable_type_attributes->value_rank != NOT_USED){
         sprintf(buffer, "%d", variable_type->variable_type_attributes->value_rank);
         xmlNewProp(variable_type->node, BAD_CAST "ValueRank", BAD_CAST buffer);
     }
     
-    if(variable_type->variable_type_attributes->is_abstract != -1){
+    if(variable_type->variable_type_attributes->is_abstract != NOT_USED){
         sprintf(buffer, "%s", 
             (variable_type->variable_type_attributes->is_abstract == true ? "true" : "false"));
         xmlNewProp(variable_type->node, BAD_CAST "IsAbstract", BAD_CAST buffer);
@@ -723,13 +1046,13 @@ DL_OPCUA_ERR_t datalog_opcua_create_node_reference_type_attributes(
 {
     char buffer[32];
 
-    if(reference_type->reference_type_attributes->is_abstract != -1){
+    if(reference_type->reference_type_attributes->is_abstract != NOT_USED){
         sprintf(buffer, "%s", 
             (reference_type->reference_type_attributes->is_abstract == true ? "true" : "false"));
         xmlNewProp(reference_type->node, BAD_CAST "IsAbstract", BAD_CAST buffer);
     }
     
-    if(reference_type->reference_type_attributes->symmetric != -1){
+    if(reference_type->reference_type_attributes->symmetric != NOT_USED){
         sprintf(buffer, "%s", 
             (reference_type->reference_type_attributes->symmetric == true ? "true" : "false"));
         xmlNewProp(reference_type->node, BAD_CAST "Symmetric", BAD_CAST buffer);
@@ -747,12 +1070,12 @@ DL_OPCUA_ERR_t datalog_opcua_create_node_data_type_attributes(
 {
     char buffer[32];
 
-    if(data_type->data_type_attributes->is_abstract != -1){
+    if(data_type->data_type_attributes->is_abstract != NOT_USED){
         sprintf(buffer, "%s", 
             (data_type->data_type_attributes->is_abstract == true ? "true" : "false"));
         xmlNewProp(data_type->node, BAD_CAST "IsAbstract", BAD_CAST buffer);
     }
-    
+   
     return DL_OPCUA_OK;
 }
 
@@ -1107,14 +1430,20 @@ DL_OPCUA_ERR_t datalog_opcua_add_id_contents(xmlNodePtr node, opcua_node_id_t* i
 {
     char buffer[32]; 
 
-    if((id->i) != 0 && ((id->ns == 0) || (id->ns == -1))){
+    if((id->i) != 0 && (id->ns == 0)){
         sprintf(buffer, "i=%d", id->i);                
+        xmlNodeSetContent(node, BAD_CAST buffer);
+    }else if((id->i) != 0 && (id->ns == -1)){
+        sprintf(buffer, "ns=1;i=%d", id->i);                
         xmlNodeSetContent(node, BAD_CAST buffer);
     }else if((id->i) == 0 && (id->ns != 0)){
         sprintf(buffer, "ns=%d", id->ns);
         xmlNodeSetContent(node, BAD_CAST buffer);
     }else if((id->i) != 0 && (id->ns != 0)){
         sprintf(buffer, "ns=%d;i=%d", id->ns, id->i);
+        xmlNodeSetContent(node, BAD_CAST buffer);
+    }else{
+        sprintf(buffer, "ns=1;i=%d", id->i);
         xmlNodeSetContent(node, BAD_CAST buffer);
     }
 
@@ -1142,9 +1471,13 @@ DL_OPCUA_ERR_t datalog_opcua_add_id_attribute(xmlNodePtr node, char* attribute,
 
     xmlAttrPtr tmp_attr = NULL; 
 
-    if((id->i) != 0 && ((id->ns == 0) || (id->ns == -1))){
+    if((id->i) != 0 && (id->ns == 0)){
         tmp_attr = xmlNewProp(node, BAD_CAST attribute, NULL);
         sprintf(buffer, "i=%d", id->i);                
+        xmlSetProp(node, BAD_CAST attribute, BAD_CAST buffer);
+    }else if((id->i) != 0 && (id->ns == -1)){
+        tmp_attr = xmlNewProp(node, BAD_CAST attribute, NULL);
+        sprintf(buffer, "ns=1;i=%d", id->i);                
         xmlSetProp(node, BAD_CAST attribute, BAD_CAST buffer);
     }else if((id->i) == 0 && (id->ns != 0)){
         tmp_attr = xmlNewProp(node, BAD_CAST attribute, NULL);
@@ -1153,6 +1486,10 @@ DL_OPCUA_ERR_t datalog_opcua_add_id_attribute(xmlNodePtr node, char* attribute,
     }else if((id->i) != 0 && (id->ns != 0)){
         tmp_attr = xmlNewProp(node, BAD_CAST attribute, NULL);
         sprintf(buffer, "ns=%d;i=%d", id->ns, id->i);
+        xmlSetProp(node, BAD_CAST attribute, BAD_CAST buffer);
+    }else{
+        tmp_attr = xmlNewProp(node, BAD_CAST attribute, NULL);
+        sprintf(buffer, "ns=1;i=%d", id->i);
         xmlSetProp(node, BAD_CAST attribute, BAD_CAST buffer);
     }
 
